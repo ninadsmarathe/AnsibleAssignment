@@ -1,0 +1,35 @@
+Connecting to EC2 instance using ssh:
+In the local command prompt, type scp -i path\ ansiblekey.pem -r path\ ansiblekey.pem ubuntu@dns-name :/home/ubuntu/.ssh/ansiblekey.pem
+
+
+Creating a playbook to deploy apache server:
+Writing the hosts file:
+⦁	Add the following code in your EC2 Instance Connect
+	[apache] 
+vm1 ansible_host=ip_addr ansible_ssh_private_key_file=~/.ssh/keypair.pem 
+vm2 ansible_host=ip_addr ansible_ssh_private_key_file=~/.ssh/keypair.pem 
+[all:vars] 
+ansible_python_interpreter=/usr/bin/python3 
+
+
+apache_install.yml
+-/ hosts: apache 
+become: true 
+tasks: 
+- name: install apache2 
+apt: name=apache2 update_cache=yes state=latest 
+- name: Copy your index file 
+template: 
+src: "index.html" 
+dest: "/var/www/html/index.html" 
+
+
+uninstall_apache.yml 
+--- 
+- hosts: apache 
+become: true 
+tasks: 
+- name: uninstall apache2 
+apt: name=apache2 autoremove=yes state=absent 
+
+
